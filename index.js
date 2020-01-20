@@ -32,6 +32,18 @@ class Home extends React.Component{
       num:0,
     }
   }
+  componentWillMount(){
+    console.log('组件将要渲染');
+  }
+  componentDidMount(){
+    console.log('组件已经渲染');
+  }
+  componentWillUpdate(){
+    console.log('组件将要更新');
+  }
+  componentDidUpdate(){
+    console.log('组件已经更新');
+  }
   render(){
     return (
       <div>

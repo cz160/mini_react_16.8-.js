@@ -21,14 +21,24 @@ export function renderComponent(comp){
   let base;
   const renderer = comp.render(); // 虚拟dom
   base = _render(renderer) // 节点
+  if(comp.base){
+    if(comp.componentWillUpdate) comp.componentWillUpdate();
+  }else if(comp.componentDidMount){
+    comp.componentDidMount();
+  }
   // 替换节点
   if(comp.base && comp.base.parentNode){
-    comp.base.parentNode.replaceChild(base,comp.base)
+    comp.base.parentNode.replaceChild(base,comp.base);
+    if(comp.componentDidUpdate) comp.componentDidUpdate();
   }
   comp.base = base;
 }
 // 设置组件属性
 function setComponentProps(comp,props){
+  if(!comp.base){
+    if(comp.componentWillMount) comp.componentWillMount();
+    if(comp.componentWillReceiveProps) comp.componentWillReceiveProps();
+  }
   comp.props = props;
 }
 

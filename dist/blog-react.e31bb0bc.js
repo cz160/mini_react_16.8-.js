@@ -181,10 +181,17 @@ function renderComponent(comp) {
   var renderer = comp.render(); // 虚拟dom
 
   base = _render(renderer); // 节点
-  // 替换节点
+
+  if (comp.base) {
+    if (comp.componentWillUpdate) comp.componentWillUpdate();
+  } else if (comp.componentDidMount) {
+    comp.componentDidMount();
+  } // 替换节点
+
 
   if (comp.base && comp.base.parentNode) {
     comp.base.parentNode.replaceChild(base, comp.base);
+    if (comp.componentDidUpdate) comp.componentDidUpdate();
   }
 
   comp.base = base;
@@ -192,6 +199,11 @@ function renderComponent(comp) {
 
 
 function setComponentProps(comp, props) {
+  if (!comp.base) {
+    if (comp.componentWillMount) comp.componentWillMount();
+    if (comp.componentWillReceiveProps) comp.componentWillReceiveProps();
+  }
+
   comp.props = props;
 } // 渲染页面
 
@@ -425,6 +437,26 @@ function (_React$Component) {
   }
 
   _createClass(Home, [{
+    key: "componentWillMount",
+    value: function componentWillMount() {
+      console.log('组件将要渲染');
+    }
+  }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      console.log('组件已经渲染');
+    }
+  }, {
+    key: "componentWillUpdate",
+    value: function componentWillUpdate() {
+      console.log('组件将要更新');
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      console.log('组件已经更新');
+    }
+  }, {
     key: "render",
     value: function render() {
       return _react.default.createElement("div", null, _react.default.createElement("span", null, "Hello React"), _react.default.createElement("span", null, "\u6211\u5F53\u524D\u7B49\u4E8E:", this.state.num), _react.default.createElement("button", {
