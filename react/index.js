@@ -1,3 +1,4 @@
+import Component from './component';
 function createElement(tag,attrs,...childrens){
   return {
     tag, // 外层标签
@@ -7,4 +8,5 @@ function createElement(tag,attrs,...childrens){
 }
 export default {
   createElement,
+  Component,
 };

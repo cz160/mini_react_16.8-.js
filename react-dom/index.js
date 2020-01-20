@@ -4,8 +4,9 @@ import Component from "../react/Component";
 function createComponent(comp,props){
   // 区分函数形式和类形式
   let instance;
-  if(comp.prototype&&comp.prototype.render){ // 类组件
+  if(comp.prototype && comp.prototype.render){ // 类组件
     instance = new comp();
+    console.log(instance);
   }else{ // 函数组件(将其转换为类组件)
     instance = new Component(props);
     instance.constructor = comp;
@@ -15,8 +16,8 @@ function createComponent(comp,props){
   }
   return instance;
 }
-// 渲染组件
-function renderComponent(comp){
+// 渲染||更新组件
+export function renderComponent(comp){
   let base;
   const renderer = comp.render(); // 虚拟dom
   base = _render(renderer) // 节点
