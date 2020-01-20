@@ -144,6 +144,27 @@ var _default = {
   createElement: createElement
 };
 exports.default = _default;
+},{}],"react/Component.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Component = function Component() {
+  var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  _classCallCheck(this, Component);
+
+  this.props = props;
+  this.state = {};
+};
+
+var _default = Component;
+exports.default = _default;
 },{}],"react-dom/index.js":[function(require,module,exports) {
 "use strict";
 
@@ -152,22 +173,84 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+var _Component = _interopRequireDefault(require("../react/Component"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+// 创建组件
+function createComponent(comp, props) {
+  // 区分函数形式和类形式
+  var instance;
+
+  if (comp.prototype && comp.prototype.render) {
+    // 类组件
+    instance = new comp();
+  } else {
+    // 函数组件(将其转换为类组件)
+    instance = new _Component.default(props);
+    instance.constructor = comp;
+
+    instance.render = function () {
+      return this.constructor(props);
+    };
+  }
+
+  return instance;
+} // 渲染组件
+
+
+function renderComponent(comp) {
+  var base;
+  var renderer = comp.render(); // 虚拟dom
+
+  base = _render(renderer); // 节点
+  // 替换节点
+
+  if (comp.base && comp.base.parentNode) {
+    comp.base.parentNode.replaceChild(base, comp.base);
+  }
+
+  comp.base = base;
+} // 设置组件属性
+
+
+function setComponentProps(comp, props) {
+  comp.props = props;
+} // 渲染页面
+
 
 function render(vnode, container) {
   // 参数：虚拟dom,容器节点
+  return container.appendChild(_render(vnode));
+} // 将虚拟dom转化为真实dom
+
+
+function _render(vnode) {
   if (vnode === undefined || typeof vnode === 'boolean' || vnode === null) return;
   if (typeof vnode === 'number') vnode = String(vnode); // 如果Vode是一个文本节点
 
   if (typeof vnode === 'string') {
-    var textNode = document.createTextNode(vnode);
-    return container.appendChild(textNode);
+    return document.createTextNode(vnode);
   }
 
   var _vnode = vnode,
       tag = _vnode.tag,
       attrs = _vnode.attrs,
-      childrens = _vnode.childrens;
+      childrens = _vnode.childrens; // 如果为组件
+
+  if (typeof tag === 'function') {
+    // 创建组件
+    var comp = createComponent(tag, attrs); // 设置组件属性
+
+    setComponentProps(comp, attrs); // 渲染组件
+
+    renderComponent(comp); // 返回组件待渲染的节点
+
+    return comp.base;
+  }
+
   var dom = document.createElement(tag);
 
   if (attrs) {
@@ -181,7 +264,7 @@ function render(vnode, container) {
   childrens && childrens.forEach(function (child) {
     render(child, dom);
   });
-  return container.appendChild(dom);
+  return dom;
 } // 设置属性
 
 
@@ -226,7 +309,7 @@ var _default = {
   render: render
 };
 exports.default = _default;
-},{}],"index.js":[function(require,module,exports) {
+},{"../react/Component":"react/Component.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
 var _react = _interopRequireDefault(require("./react"));
@@ -235,18 +318,29 @@ var _reactDom = _interopRequireDefault(require("./react-dom"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var ele = _react.default.createElement("div", {
-  className: "active",
-  title: "123"
-}, _react.default.createElement("span", {
-  style: {
-    color: 'red'
-  }
-}, "Hello React"), _react.default.createElement("div", null, _react.default.createElement("p", null, "111"), _react.default.createElement("p", null, "222")));
+// const ele = (
+//   <div className='active' title="123">
+//     <span style={{color:'red'}}>Hello React</span>
+//     <div>
+//       <p>111</p>
+//       <p>222</p>
+//     </div>
+//   </div>
+// )
+function Home() {
+  return _react.default.createElement("div", {
+    className: "active",
+    title: "123"
+  }, _react.default.createElement("span", {
+    style: {
+      color: 'red'
+    }
+  }, "Hello React"), _react.default.createElement("div", null, _react.default.createElement("p", null, "111"), _react.default.createElement("p", null, "222")));
+}
 
-console.log(ele);
-
-_reactDom.default.render(ele, document.querySelector('#root'));
+_reactDom.default.render(_react.default.createElement(Home, {
+  title: "cz"
+}), document.querySelector('#root'));
 },{"./react":"react/index.js","./react-dom":"react-dom/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -275,7 +369,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57356" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58271" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
